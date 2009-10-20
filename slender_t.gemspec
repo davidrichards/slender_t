@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{slender_t}
-  s.version = "0.1.1"
+  s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["David Richards"]
@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
      "VERSION",
      "bin/slender_t",
      "lib/slender_t.rb",
-     "spec/fixtures/movies.csv",
+     "slender_t.gemspec",
      "spec/fixtures/simple.csv",
      "spec/slender_t_spec.rb",
      "spec/spec_helper.rb"
