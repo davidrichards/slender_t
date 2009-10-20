@@ -5,9 +5,9 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "slender_t"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
-    gem.email = "drichards@showcase60.com"
+    gem.summary = %Q{Simple triples storage}
+    gem.description = %Q{Simple triples storage for projects too small to install an RDF database.}
+    gem.email = "david@fleetventures.com"
     gem.homepage = "http://github.com/davidrichards/slender_t"
     gem.authors = ["David Richards"]
     gem.add_development_dependency "rspec"
