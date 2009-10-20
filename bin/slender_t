@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby -wKU
+require 'yaml'
+
+version = File.read(File.join(File.dirname(__FILE__), %w(.. VERSION)))
+st_file = File.join(File.dirname(__FILE__), %w(.. lib slender_t))
+
+irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
+
+require 'optparse'
+options = { :irb => irb, :without_stored_procedures => false }
+OptionParser.new do |opt|
+  opt.banner = "Usage: console [environment] [options]"
+  opt.on("--irb=[#{irb}]", 'Invoke a different irb.') { |v| options[:irb] = v }
+  opt.parse!(ARGV)
+end
+
+libs =  " -r irb/completion -r #{st_file}"
+
+puts "Loading SlenderT version: #{version}"
+
+exec "#{options[:irb]} #{libs} --simple-prompt"

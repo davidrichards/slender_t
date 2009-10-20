@@ -1,6 +1,17 @@
 = slender_t
 
-Description goes here.
+SlenderT is a triples store  It is simple for the simple jobs.  I decided to replace a recommendation engine with a set of triples and some simple query tools, and this is the result.  I didn't want to break out the bigger tools for something that will only have hundreds of triples.
+
+The ideas started with of "Programming the Semantic Web" by Toby Segaran et al.  Toby's code was in Python, and of course this is a Ruby version.  I've made quite a few changes with the query tools and using my Ruby idioms, but this is still a very simple gem.
+
+== Usage
+
+From the command line:
+
+slender_t
+>> ...
+
+
 
 == Note on Patches/Pull Requests
  

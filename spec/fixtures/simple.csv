@@ -1,0 +1,8 @@
+a,implies,b
+a,implies,d
+c,implies,d
+d,implies,e
+f,implies,a
+e,implies,a
+b,implies,c
+a,does_not_imply,c
