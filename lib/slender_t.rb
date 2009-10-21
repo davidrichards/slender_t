@@ -2,7 +2,13 @@ class SlenderT
   
   require 'rubygems'
   require 'open-uri'
-  require 'fastercsv'
+  if RUBY_VERSION =~ /^1\.9/
+    require 'csv'
+    FCSV = CSV
+  else
+    require 'fastercsv'
+  end
+  require 'benchmark'
   
   class << self
     def load(source, opts={})
@@ -14,6 +20,7 @@ class SlenderT
   
   def initialize(contents=nil, opts={})
     @spo, @pos, @osp = {}, {}, {}
+    m = opts.fetch(:m, 500)
     self.load(contents, opts) if contents
   end
   
@@ -97,6 +104,7 @@ class SlenderT
       []
     end
   end
+  alias :triples :find
 
   def inspect
     self.spo.keys.size > 20 ? "#{self.class}: #{self.spo.keys.size} unique subjects" : "#{self.class}: #{self.spo.keys.inspect}"
@@ -115,11 +123,73 @@ class SlenderT
     nil
   end
   
+  # Take a list of triples with variables in them, and resolve the constraints of the triples.
+  # Usage: query([
+  # ['?company', 'headquarters', 'New York'],
+  # ['?company', 'industry', 'Investment Banking'],
+  # ])
+  def query(*triples)
+    bindings = nil
+    triples.each do |triple|
+      binding_position = {}
+      query = []
+      triple.each_with_index do |e, i|
+        if query_variable?(e)
+          binding_position[e] = i
+          query << nil
+        else
+          query << e 
+        end
+      end
+      rows = find(*query)
+      if bindings.nil?
+        bindings = rows.inject([]) do |list, row|
+          binding = {}
+          binding_position.each do |var, pos|
+            binding[var] = row[pos]
+          end
+          list << binding
+        end
+      else
+        new_binding = []
+        bindings.each do |binding|
+          rows.each do |row|
+            valid_match = true
+            temp_binding = binding.dup
+            binding_position.each do |var, pos|
+              if temp_binding.include?(var)
+                valid_match = false if temp_binding[var] != row[pos]
+              else
+                temp_binding[var] = row[pos]
+              end
+            end
+            new_binding << temp_binding if valid_match
+          end
+        end
+        bindings = new_binding.dup
+      end
+      bindings
+    end
+    return bindings
+  end
+
+  
   protected
+  
+    # Is this thing a variable, or a value?  
+    # Rigth now, we use "?some_name" to setup the variable in a query.
+    def query_variable?(obj)
+      begin
+        obj.to_s =~ /^\?/ ? true : false
+      rescue
+        false
+      end
+    end
+
+    # Assuming a trimmed triple entry
     def add_to_index(index, a, b, c)
       if index.keys.include?(a) and index[a].keys.include?(b)
-        # TODO: May not be efficient enough
-        index[a][b] = index[a][b] | [c]
+        index[a][b] << c
       elsif index.keys.include?(a)
         index[a][b] = [c]
       else
