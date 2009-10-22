@@ -21,9 +21,54 @@ From the command line:
   >> st.find nil, :name
   # => [[:david, :name, "David Richards"], [:code, :name, "Software"]]
 
-I'll put some more exciting examples up here when I get the queries setup the way I want to have them.  I think I'll bind variables, like in the book.  We'll see, there may be a simpler, more Ruby way to query the database, I'll think about it in the morning.
+I've tried this with some larger data sets.  The business data set that the O'Reilly provides can load about 36,500 triples in 22.3 seconds.  I'd say that somewhere around that size of a data set is about where this library begins to need something a little more robust, such as Sesame or Redland.  It's up to you, of course.  I haven't made much effort at optimization, with the exception of the add_to_index method, which was exponential before, and is nearly linear now.  
 
-You should know that you can load and save your triplet stores:
+I've implemented the query concept from the book.  The syntax is a little strange, but it works fine.  Here is an example:
+
+  >> db.query(['?company', 'headquarters', 'New_York_New_York'], 
+  ?> ['?company', 'industry', 'Investment Banking'],            
+  ?> ['?contribution', 'contributor', '?company'],              
+  ?> ['?contribution', 'recipient', 'Orrin Hatch'],             
+  ?> ['?contribution', 'amount', '?dollars'])                   
+  => [{"?contribution"=>"contrib285", "?dollars"=>30700.0, "?company"=>"BSC"}]
+  
+What this means is that BSC contributed $30,700 to Senator Orrin Hatch.  If I dig around a little, I can find out some more information.  
+
+  >> val = db.query(['?company', 'headquarters', 'New_York_New_York'], 
+  ?> ['?company', 'industry', 'Investment Banking'],            
+  ?> ['?contribution', 'contributor', '?company'],              
+  ?> ['?contribution', 'recipient', '?recipient'],             
+  ?> ['?contribution', 'amount', '?dollars'])
+  >> val.size
+  => 110
+  
+That tells us that we know of 110 contributions from New York investment banks.
+
+>> db.find('BSC', 'name', nil)
+=> [["BSC", "name", "Bear Stearns"]]
+
+That tells us that BSC is Bear Stearns.
+
+  >> val = db.query(['?contribution', 'contributor', 'BSC'],              
+  ?> ['?contribution', 'recipient', '?recipient'],                        
+  ?> ['?contribution', 'amount', '?dollars'])                             
+  => [{"?contribution"=>"contrib285", "?dollars"=>30700.0, "?recipient"=>"Orrin Hatch"}, {"?contribution"=>"contrib284",
+  "?dollars"=>168335.0, "?recipient"=>"Hillary Rodham Clinton"}, {"?contribution"=>"contrib287", "?dollars"=>5600.0,
+  "?recipient"=>"Christopher Shays"}, {"?contribution"=>"contrib288", "?dollars"=>205100.0, "?recipient"=>"Christopher Dodd"},
+  {"?contribution"=>"contrib290", "?dollars"=>17300.0, "?recipient"=>"Frank Lautenberg"}, {"?contribution"=>"contrib286",
+  "?dollars"=>5000.0, "?recipient"=>"Barney Frank"}, {"?contribution"=>"contrib289", "?dollars"=>13000.0, "?recipient"=>"Michael
+  Dean Crapo"}, {"?contribution"=>"contrib294", "?dollars"=>4600.0, "?recipient"=>"Pete Sessions"},
+  {"?contribution"=>"contrib295", "?dollars"=>5000.0, "?recipient"=>"Paul E. Kanjorski"}, {"?contribution"=>"contrib292",
+  "?dollars"=>6600.0, "?recipient"=>"Nita Lowey"}, {"?contribution"=>"contrib293", "?dollars"=>5000.0, "?recipient"=>"Deborah
+  Pryce"}, {"?contribution"=>"contrib291", "?dollars"=>102260.0, "?recipient"=>"Joe Lieberman"}]
+  >> val.size
+  => 12
+
+That tells us that we know about 12 contributions that Bear Stearns made, including to Hillary Rodham Clinton for $168,335 and Joe Lieberman for $102,260.
+
+You get the picture.  I think I'll play with some classes soon to play with some inference, graph merging, and query patterns.
+
+You should also know that you can load and save your triplet stores:
 
   # st = SlenderT.load(some_csv_content_filename_or_url)
   # st.save(some_filename)

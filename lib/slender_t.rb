@@ -8,7 +8,6 @@ class SlenderT
   else
     require 'fastercsv'
   end
-  require 'benchmark'
   
   class << self
     def load(source, opts={})
@@ -20,7 +19,6 @@ class SlenderT
   
   def initialize(contents=nil, opts={})
     @spo, @pos, @osp = {}, {}, {}
-    m = opts.fetch(:m, 500)
     self.load(contents, opts) if contents
   end
   
@@ -188,14 +186,24 @@ class SlenderT
 
     # Assuming a trimmed triple entry
     def add_to_index(index, a, b, c)
-      if index.keys.include?(a) and index[a].keys.include?(b)
+      begin
         index[a][b] << c
-      elsif index.keys.include?(a)
-        index[a][b] = [c]
-      else
-        index[a] = {}
+      rescue
+        index[a] ||= {}
         index[a][b] = [c]
       end
+      # The old, slow way of doing things...the new way is nearly linear at
+      # 0.0005 seconds per transaction at 100 inserts
+      # and 0.000529 seconds per transaction at 10,000 inserts.
+      # 
+      # if index.keys.include?(a) and index[a].keys.include?(b)
+      #   index[a][b] << c
+      # elsif index.keys.include?(a)
+      #   index[a][b] = [c]
+      # else
+      #   index[a] = {}
+      #   index[a][b] = [c]
+      # end
     end
     
     def remove_from_index(index, a, b, c)
