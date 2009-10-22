@@ -44,8 +44,8 @@ What this means is that BSC contributed $30,700 to Senator Orrin Hatch.  If I di
   
 That tells us that we know of 110 contributions from New York investment banks.
 
->> db.find('BSC', 'name', nil)
-=> [["BSC", "name", "Bear Stearns"]]
+  >> db.find('BSC', 'name', nil)
+  => [["BSC", "name", "Bear Stearns"]]
 
 That tells us that BSC is Bear Stearns.
 
@@ -66,7 +66,7 @@ That tells us that BSC is Bear Stearns.
 
 That tells us that we know about 12 contributions that Bear Stearns made, including to Hillary Rodham Clinton for $168,335 and Joe Lieberman for $102,260.
 
-You get the picture.  I think I'll play with some classes soon to play with some inference, graph merging, and query patterns.
+You get the picture.  I think I'll create some classes soon to play with some inference, graph merging, and query patterns.
 
 You should also know that you can load and save your triplet stores:
 
